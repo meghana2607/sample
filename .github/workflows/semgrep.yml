@@ -1,78 +1,16 @@
-name: Semgrep and Maven CI
+name: Semgrep Analysis
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   semgrep:
-    name: Semgrep Analysis
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: 11
-          architecture: x64
-          distribution: 'adopt'
-          server-id: github
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
-          check-latest: false
 
       - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
           config: .semgrep.yml
-
-  maven:
-    name: Maven Build and Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: 11
-          architecture: x64
-          distribution: 'adopt'
-          server-id: github
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
-          check-latest: false
-
-      - name: Build and Test with Maven
-        run: mvn clean verify --fail-never
-
-      - name: Archive Maven Artifacts
-        if: success() && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v2
-        with:
-          name: maven-artifacts
-          path: target/
-
-      - name: Cleanup Semgrep Results
-        if: success() && github.event_name != 'pull_request'
-        run: rm -rf results/semgrep-results
-
-# Define the workflow triggers explicitly
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
