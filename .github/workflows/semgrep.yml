@@ -14,3 +14,18 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           config: .semgrep.yml
+
+      - name: Save Semgrep Results
+        run: |
+          mkdir -p artifacts
+          if [ -f semgrep.sarif ]; then
+            cp semgrep.sarif artifacts/
+          else
+            echo "No Semgrep results found."
+          fi
+
+      - name: Upload Semgrep Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: semgrep-results
+          path: artifacts/
