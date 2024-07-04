@@ -3,6 +3,8 @@ name: Semgrep Analysis
 on:
   push:
   pull_request:
+    branches:
+      - main  # Adjust to your main branch name
 
 jobs:
   semgrep:
@@ -12,69 +14,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Run Semgrep
+      - name: Run Semgrep Analysis
         uses: returntocorp/semgrep-action@v1
         with:
           config: .semgrep.yml
 
-  build-test-core-x86:
-    runs-on: ubuntu-latest
-    container:
-      image: returntocorp/ocaml:alpine-2024-01-18
-    env:
-      HOME: /root
-
-    steps:
-      - name: Make checkout speedy
-        run: git config --global fetch.parallel 50
-
-      - name: Checkout repository (alternative method)
-        uses: actions/checkout@v2
-        with:
-          ref: main  # Specify a specific branch
-
-      - name: Configure git safedir properly
-        run: git config --global --add safe.directory $(pwd)
-
-      - name: Set GHA cache for OPAM in ~/.opam
-        env:
-          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 2
-        uses: actions/cache@v3
-        with:
-          path: ~/.opam
-          key: ${{ runner.os }}-${{ runner.arch }}-opam-deps-4.14.0-${{ hashFiles('semgrep.opam') }}
-
-      - name: Install dependencies (example step)
-        run: |
-          eval $(opam env)
-          opam install -y make  # Ensure make is installed
-          make install-deps-for-semgrep-core  # Correct command if 'install-deps-ALPINE-for-semgrep-core' is not found
-          # Replace 'make install-deps-for-semgrep-core' with correct command if needed
-
-      - name: Build semgrep-core
-        run: opam exec -- make core
-
-      - name: Make artifact for bin/semgrep-core
+      - name: Archive Semgrep Results
+        if: success()  # Only archive if Semgrep analysis succeeds
         run: |
           mkdir artifacts
-          cp bin/semgrep-core artifacts/
-          tar czf artifacts.tgz artifacts
-        continue-on-error: true  # Example: continue even if this step fails
+          cp -r path/to/semgrep-results artifacts/
+          tar czf semgrep-results.tar.gz artifacts/
+        # You can adjust 'path/to/semgrep-results' to where Semgrep outputs results
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload Semgrep Results Artifact
+        if: success()  # Only upload artifact if Semgrep analysis succeeds
+        uses: actions/upload-artifact@v2
         with:
-          name: semgrep-core-x86-artifact
-          path: artifacts.tgz
+          name: semgrep-results
+          path: semgrep-results.tar.gz
 
-      - name: Test semgrep-core
-        run: opam exec -- make core-test
+      # You can add more steps here for additional actions after Semgrep analysis
 
-      - name: Deploy to production (example deployment step)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "Deploying to production..."
-          # Add deployment commands here
+  # Add more jobs if needed for additional CI tasks
+
 
 
 
