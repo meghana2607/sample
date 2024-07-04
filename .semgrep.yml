@@ -1,7 +1,11 @@
-rules:
-  - id: java-print-statement
-    patterns:
-      - pattern: System.out.println($MSG);
-    message: "Avoid using System.out.println in production code."
-    languages: [java]
-    severity: WARNING
+- name: Create artifacts
+  run: |
+    mkdir -p artifacts
+    if [ -d "results/semgrep-results" ] && [ "$(ls -A results/semgrep-results)" ]; then
+      cp -r results/semgrep-results/* artifacts/
+      tar czf semgrep-results.tar.gz -C artifacts .
+    else
+      echo "Semgrep results directory not found or empty."
+      ls -l results/semgrep-results  # Debugging: List contents of results/semgrep-results directory
+      exit 1
+    fi
