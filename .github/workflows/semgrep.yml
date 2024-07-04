@@ -10,10 +10,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Semgrep
+      - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
-          config: '.semgrep.yml'
+          config: .semgrep.yml
 
-      - name: Run Semgrep
-        run: semgrep --config .semgrep.yml
