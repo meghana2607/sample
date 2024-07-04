@@ -22,9 +22,9 @@ jobs:
       - name: Prepare Semgrep Results
         run: |
           mkdir -p artifacts
-          if [ -d "path/to/semgrep-results" ]; then
+          if [ -d "path/to/semgrep-results" ] && [ "$(ls -A path/to/semgrep-results)" ]; then
             cp -r path/to/semgrep-results/* artifacts/
-            tar czf semgrep-results.tar.gz artifacts/
+            tar czf semgrep-results.tar.gz -C artifacts .
           else
             echo "Semgrep results directory not found or empty."
             exit 1
@@ -36,8 +36,5 @@ jobs:
         with:
           name: semgrep-results
           path: semgrep-results.tar.gz
-
-      
-
 
 
