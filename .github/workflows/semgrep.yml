@@ -22,22 +22,22 @@ jobs:
       - name: Prepare Semgrep Results
         run: |
           mkdir -p artifacts
-          # Replace 'path/to/semgrep-results' with the actual path where Semgrep outputs results
           if [ -d "path/to/semgrep-results" ]; then
             cp -r path/to/semgrep-results/* artifacts/
+            tar czf semgrep-results.tar.gz artifacts/
           else
-            echo "Semgrep results directory not found."
+            echo "Semgrep results directory not found or empty."
             exit 1
           fi
-          tar czf semgrep-results.tar.gz artifacts/
 
       - name: Upload Semgrep Results Artifact
+        if: success()  # Upload artifact only if Semgrep analysis succeeds
         uses: actions/upload-artifact@v2
         with:
           name: semgrep-results
           path: semgrep-results.tar.gz
 
-     
+      
 
 
 
