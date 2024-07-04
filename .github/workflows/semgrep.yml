@@ -1,22 +1,8 @@
 name: Semgrep Analysis
 
-on: [push, pull_request]
-
-jobs:
-  semgrep:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Run Semgrep
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: .semgrep.yml
-name: Semgrep Analysis
-
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   semgrep:
@@ -31,11 +17,13 @@ jobs:
         with:
           config: .semgrep.yml
 
-  job:
-    container: returntocorp/ocaml:alpine-2024-01-18
+  build-test-core-x86:
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/ocaml:alpine-2024-01-18
     env:
       HOME: /root
-    runs-on: ubuntu-latest
+
     steps:
       - name: Make checkout speedy
         run: git config --global fetch.parallel 50
@@ -53,8 +41,8 @@ jobs:
           SEGMENT_DOWNLOAD_TIMEOUT_MINS: 2
         uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-${{ runner.arch }}-opam-deps-4.14.0-${{hashFiles('semgrep.opam')}}
           path: ~/.opam
+          key: ${{ runner.os }}-${{ runner.arch }}-opam-deps-4.14.0-${{ hashFiles('semgrep.opam') }}
 
       - name: Install dependencies (example step)
         run: |
@@ -70,7 +58,7 @@ jobs:
           mkdir artifacts
           cp bin/semgrep-core artifacts/
           tar czf artifacts.tgz artifacts
-        continue-on-error: true  # Example: continue even if this step fails
+        continue-on-error: true  # Continue even if this step fails
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -82,12 +70,9 @@ jobs:
         run: opam exec -- make core-test
 
       - name: Deploy to production (example deployment step)
-        if: github.ref == 'refs/heads/main'  # Example condition
+        if: github.ref == 'refs/heads/main'
         run: |
           echo "Deploying to production..."
           # Add deployment commands here
 
-    name: build-test-core-x86
-    on:
-      workflow_call: null
-      workflow_dispatch: null
+
