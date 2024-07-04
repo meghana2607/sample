@@ -19,7 +19,15 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          java-version: '11'  # Adjust Java version as per your project requirements
+          java-version: '11'
+          distribution: 'adopt'
+          java-package: jdk
+          architecture: x64
+          check-latest: false
+          server-id: github
+          server-username: ${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+          overwrite-settings: true
 
       - name: Build with Maven
         run: mvn clean verify --fail-never
@@ -45,10 +53,4 @@ jobs:
       - name: Upload Semgrep Results Artifact
         if: success()  # Upload artifact only if Semgrep analysis and preparation succeed
         uses: actions/upload-artifact@v2
-        with:
-          name: semgrep-results
-          path: semgrep-results.tar.gz
-
-      # Add more steps as needed for testing, deployment, notifications, etc.
-
-   
+  
