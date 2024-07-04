@@ -47,8 +47,9 @@ jobs:
       - name: Install dependencies (example step)
         run: |
           eval $(opam env)
-          make install-deps-ALPINE-for-semgrep-core
-          make install-deps-for-semgrep-core
+          opam install -y make  # Ensure make is installed
+          make install-deps-for-semgrep-core  # Correct command if 'install-deps-ALPINE-for-semgrep-core' is not found
+          # Replace 'make install-deps-for-semgrep-core' with correct command if needed
 
       - name: Build semgrep-core
         run: opam exec -- make core
@@ -58,7 +59,7 @@ jobs:
           mkdir artifacts
           cp bin/semgrep-core artifacts/
           tar czf artifacts.tgz artifacts
-        continue-on-error: true  # Continue even if this step fails
+        continue-on-error: true  # Example: continue even if this step fails
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -74,5 +75,7 @@ jobs:
         run: |
           echo "Deploying to production..."
           # Add deployment commands here
+
+
 
 
