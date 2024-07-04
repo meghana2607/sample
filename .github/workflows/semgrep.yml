@@ -69,13 +69,3 @@ jobs:
         if: success() && github.event_name != 'pull_request'
         run: rm -rf results/semgrep-results
 
-# Define the workflow triggers explicitly
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
