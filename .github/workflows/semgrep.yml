@@ -1,4 +1,6 @@
-name: Semgrep Analysis
+
+    
+        name: Semgrep Analysis
 
 on: [push, pull_request]
 
@@ -14,8 +16,8 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           config: .semgrep.yml
-          jobs:
-  job:
+
+  job:  # Correct indentation for this job definition
     container: returntocorp/ocaml:alpine-2024-01-18
     env:
       HOME: /root
@@ -53,7 +55,8 @@ jobs:
           path: artifacts.tgz
       - name: Test semgrep-core
         run: opam exec -- make core-test
-name: build-test-core-x86
-on:
-  workflow_call: null
-  workflow_dispatch: null
+
+    name: build-test-core-x86  # Correct indentation for job name
+    on:
+      workflow_call: null
+      workflow_dispatch: null
