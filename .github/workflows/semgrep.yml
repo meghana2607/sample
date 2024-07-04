@@ -2,9 +2,11 @@ name: Semgrep Analysis
 
 on:
   push:
+    branches:
+      - main  # Trigger on push events to the main branch
   pull_request:
     branches:
-      - main  # Adjust to your main branch name
+      - main  # Trigger on pull requests targeting the main branch
 
 jobs:
   semgrep:
@@ -14,28 +16,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'  # Adjust Java version as per your project requirements
+
+      - name: Build with Maven
+        run: mvn clean verify --fail-never
+
       - name: Run Semgrep Analysis
         uses: returntocorp/semgrep-action@v1
         with:
-          config: .semgrep.yml
+          config: .semgrep.yml  # Specify the path to your Semgrep configuration file
 
       - name: Prepare Semgrep Results
+        if: success()  # Only run if Semgrep analysis succeeds
         run: |
           mkdir -p artifacts
-          if [ -d "path/to/semgrep-results" ] && [ "$(ls -A path/to/semgrep-results)" ]; then
-            cp -r path/to/semgrep-results/* artifacts/
+          if [ -d "results/semgrep-results" ] && [ "$(ls -A results/semgrep-results)" ]; then
+            cp -r results/semgrep-results/* artifacts/
             tar czf semgrep-results.tar.gz -C artifacts .
           else
             echo "Semgrep results directory not found or empty."
-            ls -l path/to  # Debugging: List contents of path/to directory
+            ls -l results/semgrep-results  # Debugging: List contents of results/semgrep-results directory
             exit 1
           fi
 
       - name: Upload Semgrep Results Artifact
-        if: success()  # Upload artifact only if Semgrep analysis succeeds
+        if: success()  # Upload artifact only if Semgrep analysis and preparation succeed
         uses: actions/upload-artifact@v2
         with:
           name: semgrep-results
           path: semgrep-results.tar.gz
+
+      # Add more steps as needed for testing, deployment, notifications, etc.
 
    
