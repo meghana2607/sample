@@ -1,0 +1,19 @@
+name: Semgrep Analysis
+
+on: [push, pull_request]
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: '.semgrep.yml'
+
+      - name: Run Semgrep
+        run: semgrep --config .semgrep.yml
