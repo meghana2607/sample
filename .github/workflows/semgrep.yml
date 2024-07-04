@@ -10,6 +10,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
       - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
@@ -18,14 +24,16 @@ jobs:
       - name: Save Semgrep Results
         run: |
           mkdir -p artifacts
-          if [ -f semgrep.sarif ]; then
-            cp semgrep.sarif artifacts/
+          if [ -d "results/semgrep-results" ] && [ "$(ls -A results/semgrep-results)" ]; then
+            cp -r results/semgrep-results/* artifacts/
+            tar czf semgrep-results.tar.gz -C artifacts .
           else
-            echo "No Semgrep results found."
-          fi
+            echo "Semgrep results directory not found or empty."
+            ls -l results/semgrep-results  # Debugging: List contents of results/semgrep-results directory
+            exit 1
 
       - name: Upload Semgrep Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: semgrep-results
-          path: artifacts/
+          path: semgrep-results.tar.gz
