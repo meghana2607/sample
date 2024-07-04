@@ -19,26 +19,25 @@ jobs:
         with:
           config: .semgrep.yml
 
-      - name: Archive Semgrep Results
-        if: success()  # Only archive if Semgrep analysis succeeds
+      - name: Prepare Semgrep Results
         run: |
-          mkdir artifacts
-          cp -r path/to/semgrep-results artifacts/
+          mkdir -p artifacts
+          # Replace 'path/to/semgrep-results' with the actual path where Semgrep outputs results
+          if [ -d "path/to/semgrep-results" ]; then
+            cp -r path/to/semgrep-results/* artifacts/
+          else
+            echo "Semgrep results directory not found."
+            exit 1
+          fi
           tar czf semgrep-results.tar.gz artifacts/
-        # You can adjust 'path/to/semgrep-results' to where Semgrep outputs results
 
       - name: Upload Semgrep Results Artifact
-        if: success()  # Only upload artifact if Semgrep analysis succeeds
         uses: actions/upload-artifact@v2
         with:
           name: semgrep-results
           path: semgrep-results.tar.gz
 
-      # You can add more steps here for additional actions after Semgrep analysis
-
-  # Add more jobs if needed for additional CI tasks
-
-
+     
 
 
 
