@@ -33,19 +33,6 @@ jobs:
         with:
           config: .semgrep.yml
 
-      - name: Create Semgrep Results Artifact
-        run: |
-          mkdir -p artifacts
-          if [ -d "results/semgrep-results" ] && [ "$(ls -A results/semgrep-results)" ]; then
-            cp -r results/semgrep-results/* artifacts/
-            tar czf semgrep-results.tar.gz -C artifacts .
-          else
-            echo "Semgrep results directory not found or empty."
-            ls -l results/semgrep-results  # Debugging: List contents of results/semgrep-results directory
-            exit 1
-          fi
-        shell: bash
-
   maven:
     name: Maven Build and Test
     runs-on: ubuntu-latest
