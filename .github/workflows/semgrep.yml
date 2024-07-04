@@ -27,6 +27,7 @@ jobs:
             tar czf semgrep-results.tar.gz -C artifacts .
           else
             echo "Semgrep results directory not found or empty."
+            ls -l path/to  # Debugging: List contents of path/to directory
             exit 1
           fi
 
@@ -37,4 +38,4 @@ jobs:
           name: semgrep-results
           path: semgrep-results.tar.gz
 
-
+   
